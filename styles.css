@@ -1,8 +1,21 @@
-/*
+/* Web Viewer Bookmarks plugin styles */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.bookmark-header {
+  font-size: 16px;
+  color: var(--text-normal);
+}
 
-If your plugin does not need CSS, delete this file.
+.bookmark-header-div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 
-*/
+.bookmark-container {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background-color: var(--background-secondary);
+}

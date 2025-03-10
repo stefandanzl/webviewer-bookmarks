@@ -183,11 +183,25 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 				cls: "bookmark-container",
 			});
 
-			// // Add a header for each bookmark
-			// bookmarkDiv.createEl("h3", {
-			// 	text: `Bookmark: ${this.plugin.getDisplayName(bookmark)}`,
-			// 	cls: "bookmark-header",
-			// });
+			// Add a header for each bookmark
+			const headerDiv = bookmarkDiv.createDiv({
+				cls: "bookmark-header-div",
+			});
+
+			headerDiv.createEl("h3", {
+				text: `Bookmark: ${this.plugin.getDisplayName(bookmark)}`,
+				cls: "bookmark-header",
+			});
+			headerDiv
+				.createEl("button", {
+					cls: "mod-warning",
+					text: "Remove",
+				})
+				.addEventListener("click", async (e) => {
+					this.plugin.settings.bookmarks.splice(index, 1);
+					await this.plugin.saveSettings();
+					this.display();
+				});
 
 			// URL Setting
 			new Setting(bookmarkDiv)
@@ -252,29 +266,30 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 					});
 				});
 
-			// Remove Button Setting
-			new Setting(bookmarkDiv)
-				.setName("Remove Bookmark")
-				.setDesc("Delete this bookmark")
-				.addButton((button) => {
-					button
-						.setButtonText("Remove")
-						.setWarning()
-						.onClick(async () => {
-							this.plugin.settings.bookmarks.splice(index, 1);
-							await this.plugin.saveSettings();
-							this.display();
-						});
-				});
+			// // Remove Button Setting
+			// new Setting(bookmarkDiv)
+			// 	.setName("Remove Bookmark")
+			// 	.setDesc("Delete this bookmark")
+			// 	.addButton((button) => {
+			// 		button
+			// 			.setButtonText("Remove")
+			// 			.setWarning()
+			// 			.onClick(async () => {
+			// 				this.plugin.settings.bookmarks.splice(index, 1);
+			// 				await this.plugin.saveSettings();
+			// 				this.display();
+			// 			});
+			// 	});
 		});
 
 		new Setting(containerEl)
 			.setName("Reload App")
 			.setDesc("Reload Obsidian for changes to ribbons")
 			.addButton((button) => {
-				button.setButtonText("Reload").onClick(async () => {
-					this.plugin.reloadApp();
-				});
+				button
+					.setButtonText("Reload")
+					.setCta()
+					.onClick(() => this.plugin.reloadApp());
 			});
 	}
 }
