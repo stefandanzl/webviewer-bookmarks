@@ -1,134 +1,280 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+/* eslint-disable @typescript-eslint/no-inferrable-types */
+import { App, Plugin, PluginSettingTab, Setting, Notice } from "obsidian";
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
+interface Bookmark {
+	url: string;
+	ribbon: boolean;
+	command: boolean;
+	newTab: boolean;
+	lucide: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+interface WebViewerBookmarksSettings {
+	bookmarks: Bookmark[];
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+const DEFAULT_SETTINGS: WebViewerBookmarksSettings = {
+	bookmarks: [],
+};
+
+export default class WebViewerBookmarksPlugin extends Plugin {
+	settings: WebViewerBookmarksSettings;
 
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		// Add settings tab
+		this.addSettingTab(new WebViewerBookmarksSettingTab(this.app, this));
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// Setup bookmarks
+		this.setupBookmarks();
 	}
 
-	onunload() {
+	setupBookmarks() {
+		// Clear existing commands and ribbons
+		this.clearBookmarks();
 
+		// Setup each bookmark
+		this.settings.bookmarks.forEach((bookmark, index) => {
+			const iconName = bookmark.lucide || "bookmark";
+
+			// Add command if enabled
+			if (bookmark.command) {
+				this.addCommand({
+					id: `open-webviewer-bookmark-${index}`,
+					name: `Open Web Viewer Bookmark: ${this.getDisplayName(
+						bookmark
+					)}`,
+					callback: () => {
+						this.openBookmark(bookmark);
+					},
+				});
+			}
+
+			// Add ribbon if enabled
+			if (bookmark.ribbon) {
+				this.addRibbonIcon(
+					iconName,
+					`Open ${this.getDisplayName(bookmark)}`,
+					(evt: MouseEvent) => {
+						// Middle click or if newTab is true
+						if (evt.button === 1 || bookmark.newTab) {
+							this.openBookmark(bookmark, true);
+						} else {
+							this.openBookmark(bookmark, false);
+						}
+					}
+				);
+			}
+		});
+	}
+
+	clearBookmarks() {
+		// Commands are automatically cleared on plugin unload
+		// We just need to remove any ribbon icons we've added
+		// This happens automatically when the plugin is reloaded
+	}
+
+	getDisplayName(bookmark: Bookmark): string {
+		try {
+			const url = new URL(bookmark.url);
+			return url.hostname;
+		} catch (e) {
+			return bookmark.url;
+		}
+	}
+
+	openBookmark(bookmark: Bookmark, forceNewTab: boolean = false) {
+		// Use type assertion to access internal plugins
+		// @ts-ignore - using internal API
+		const internalPlugins = this.app.internalPlugins;
+		const webViewer = internalPlugins.getPluginById("webviewer");
+
+		if (!webViewer || !webViewer.enabled) {
+			new Notice("Web Viewer plugin is not enabled");
+			console.error("Web Viewer plugin is not enabled");
+			return;
+		}
+
+		const openInNewTab = forceNewTab || bookmark.newTab;
+
+		// Access through window to bypass TypeScript restrictions
+		// @ts-ignore - using internal API
+		window.app.internalPlugins
+			.getEnabledPluginById("webviewer")
+			.openUrl(bookmark.url, openInNewTab);
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData()
+		);
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		//this.setupBookmarks();
+	}
+
+	async reloadApp() {
+		// Access through window to bypass TypeScript restrictions
+		// @ts-ignore - using internal API
+		window.app.commands.executeCommandById("app:reload");
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+class WebViewerBookmarksSettingTab extends PluginSettingTab {
+	plugin: WebViewerBookmarksPlugin;
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: WebViewerBookmarksPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl } = this;
 
 		containerEl.empty();
 
+		containerEl.createEl("h2", { text: "Web Viewer Bookmarks Settings" });
+
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
+			.setDesc("Manage your bookmarks for the Web Viewer plugin")
+			.addButton((button) => {
+				button
+					.setButtonText("Add Bookmark")
+					.setCta()
+					.onClick(() => {
+						this.plugin.settings.bookmarks.push({
+							url: "https://",
+							ribbon: false,
+							command: true,
+							newTab: false,
+							lucide: "bookmark",
+						});
+						this.plugin.saveSettings();
+						this.display();
+					});
+			});
+
+		const iconHelp = containerEl.createEl("div", {
+			cls: "setting-item-description",
+		});
+
+		iconHelp.createSpan({
+			text: "For icons, enter Lucide icon names. Find all available icons at: ",
+		});
+
+		iconHelp.createEl("a", {
+			text: "Lucide Icons",
+			href: "https://lucide.dev/icons",
+			// target: "_blank",
+		});
+
+		iconHelp.createEl("p", {
+			text: "Obsidian uses Lucide icons by default. Example icon names: bookmark, globe, link, heart, external-link",
+		});
+
+		this.plugin.settings.bookmarks.forEach((bookmark, index) => {
+			// Create a div for each bookmark
+			const bookmarkDiv = containerEl.createDiv({
+				cls: "bookmark-container",
+			});
+
+			// // Add a header for each bookmark
+			// bookmarkDiv.createEl("h3", {
+			// 	text: `Bookmark: ${this.plugin.getDisplayName(bookmark)}`,
+			// 	cls: "bookmark-header",
+			// });
+
+			// URL Setting
+			new Setting(bookmarkDiv)
+				.setName("URL")
+				.setDesc("The website address to open in Web Viewer")
+				.addText((text) => {
+					text.setPlaceholder("https://")
+						.setValue(bookmark.url)
+						.onChange(async (value) => {
+							this.plugin.settings.bookmarks[index].url = value;
+							await this.plugin.saveSettings();
+						});
+				});
+
+			// Icon Setting
+			new Setting(bookmarkDiv)
+				.setName("Icon")
+				.setDesc("Lucide icon name to display in the ribbon")
+				.addText((text) => {
+					text.setPlaceholder("bookmark")
+						.setValue(bookmark.lucide)
+						.onChange(async (value) => {
+							this.plugin.settings.bookmarks[index].lucide =
+								value;
+							await this.plugin.saveSettings();
+						});
+				});
+
+			// Ribbon Toggle Setting
+			new Setting(bookmarkDiv)
+				.setName("Show in Ribbon")
+				.setDesc("Display this bookmark as an icon in the ribbon")
+				.addToggle((toggle) => {
+					toggle.setValue(bookmark.ribbon).onChange(async (value) => {
+						this.plugin.settings.bookmarks[index].ribbon = value;
+						await this.plugin.saveSettings();
+					});
+				});
+
+			// Command Toggle Setting
+			new Setting(bookmarkDiv)
+				.setName("Create Command")
+				.setDesc("Create a command to open this bookmark")
+				.addToggle((toggle) => {
+					toggle
+						.setValue(bookmark.command)
+						.onChange(async (value) => {
+							this.plugin.settings.bookmarks[index].command =
+								value;
+							await this.plugin.saveSettings();
+						});
+				});
+
+			// New Tab Toggle Setting
+			new Setting(bookmarkDiv)
+				.setName("Open in New Tab")
+				.setDesc("Open this bookmark in a new tab by default")
+				.addToggle((toggle) => {
+					toggle.setValue(bookmark.newTab).onChange(async (value) => {
+						this.plugin.settings.bookmarks[index].newTab = value;
+						await this.plugin.saveSettings();
+					});
+				});
+
+			// Remove Button Setting
+			new Setting(bookmarkDiv)
+				.setName("Remove Bookmark")
+				.setDesc("Delete this bookmark")
+				.addButton((button) => {
+					button
+						.setButtonText("Remove")
+						.setWarning()
+						.onClick(async () => {
+							this.plugin.settings.bookmarks.splice(index, 1);
+							await this.plugin.saveSettings();
+							this.display();
+						});
+				});
+		});
+
+		new Setting(containerEl)
+			.setName("Reload App")
+			.setDesc("Reload Obsidian for changes to ribbons")
+			.addButton((button) => {
+				button.setButtonText("Reload").onClick(async () => {
+					this.plugin.reloadApp();
+				});
+			});
 	}
 }
