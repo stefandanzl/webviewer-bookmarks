@@ -26,11 +26,11 @@ tasks:
             - git tag {{.VERSION}}
             - git push
             - git push --tags
-            - gh release create {{.VERSION}} --title "Web Viewer Bookmarks {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+            - task: release-create
 
     release-create:
         cmds:
-            - gh release create {{.VERSION}} --title "Web Viewer Bookmarks {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+            - gh release create {{.VERSION}} --title "Release {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
 
     test:
         cmds:
