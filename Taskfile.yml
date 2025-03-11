@@ -30,7 +30,7 @@ tasks:
 
     release-create:
         cmds:
-            - gh release create {{.VERSION}} --title "Release {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+            - gh release create {{.VERSION}} --title "{{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
 
     test:
         cmds:
