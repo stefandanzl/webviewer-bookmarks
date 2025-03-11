@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+    FILES: "main.js styles.css manifest.json"
+
+tasks:
+    default: task -a
+
+    dev: npm run dev
+
+    build: npm run build
+
+    bump:
+        cmds:
+            - npm version minor
+            - npm run version
+
+    get-version:
+        vars:
+            VERSION:
+                sh: node -e "console.log(require('./package.json').version)"
+
+    release:
+        deps: [get-version]
+        cmds:
+            - git add .
+            - git commit -m "{{.VERSION}} Commit"
+            - git tag {{.VERSION}}
+            - git push
+            - git push --tags
+            - gh release create {{.VERSION}} --title "Web Viewer Bookmarks {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}

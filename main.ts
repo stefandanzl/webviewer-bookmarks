@@ -100,7 +100,7 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 
 		// Access through window to bypass TypeScript restrictions
 		// @ts-ignore - using internal API
-		window.app.internalPlugins
+		this.app.internalPlugins
 			.getEnabledPluginById("webviewer")
 			.openUrl(bookmark.url, openInNewTab);
 	}
@@ -121,7 +121,7 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 	async reloadApp() {
 		// Access through window to bypass TypeScript restrictions
 		// @ts-ignore - using internal API
-		window.app.commands.executeCommandById("app:reload");
+		this.app.commands.executeCommandById("app:reload");
 	}
 }
 
@@ -170,7 +170,6 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 		iconHelp.createEl("a", {
 			text: "Lucide Icons",
 			href: "https://lucide.dev/icons",
-			// target: "_blank",
 		});
 
 		iconHelp.createEl("p", {
@@ -265,21 +264,6 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					});
 				});
-
-			// // Remove Button Setting
-			// new Setting(bookmarkDiv)
-			// 	.setName("Remove Bookmark")
-			// 	.setDesc("Delete this bookmark")
-			// 	.addButton((button) => {
-			// 		button
-			// 			.setButtonText("Remove")
-			// 			.setWarning()
-			// 			.onClick(async () => {
-			// 				this.plugin.settings.bookmarks.splice(index, 1);
-			// 				await this.plugin.saveSettings();
-			// 				this.display();
-			// 			});
-			// 	});
 		});
 
 		new Setting(containerEl)
