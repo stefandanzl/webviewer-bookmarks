@@ -4,6 +4,8 @@ version: "3"
 
 vars:
     FILES: "main.js styles.css manifest.json"
+    VERSION:
+        sh: node -e "console.log(require('./package.json').version)"
 
 tasks:
     default: task -a
@@ -17,13 +19,7 @@ tasks:
             - npm version minor
             - npm run version
 
-    get-version:
-        vars:
-            VERSION:
-                sh: node -e "console.log(require('./package.json').version)"
-
     release:
-        deps: [get-version]
         cmds:
             - git add .
             - git commit -m "{{.VERSION}} Commit"
@@ -31,3 +27,11 @@ tasks:
             - git push
             - git push --tags
             - gh release create {{.VERSION}} --title "Web Viewer Bookmarks {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+
+    release-create:
+        cmds:
+            - gh release create {{.VERSION}} --title "Web Viewer Bookmarks {{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+
+    test:
+        cmds:
+            - echo {{.VERSION}}
