@@ -27,7 +27,7 @@ tasks:
         cmds:
             - git add .
             - git commit -m "{{.VERSION}} Commit"
-            - git tag {{.VERSION}}
+            # - git tag {{.VERSION}}
             - git push
             - git push --tags
             - task: release-create
