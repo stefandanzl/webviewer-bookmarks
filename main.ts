@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { App, Plugin, PluginSettingTab, Setting, Notice } from "obsidian";
 
 interface Bookmark {
 	url: string;
+	title: string;
 	ribbon: boolean;
 	command: boolean;
 	newTab: boolean;
@@ -45,6 +45,7 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 					name: `Open Web Viewer Bookmark: ${this.getDisplayName(
 						bookmark
 					)}`,
+					icon: iconName,
 					callback: () => {
 						this.openBookmark(bookmark);
 					},
@@ -76,6 +77,9 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 	}
 
 	getDisplayName(bookmark: Bookmark): string {
+		if (bookmark.title !== "" && bookmark.title !== undefined) {
+			return bookmark.title;
+		}
 		try {
 			const url = new URL(bookmark.url);
 			return url.hostname;
@@ -84,7 +88,7 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 		}
 	}
 
-	openBookmark(bookmark: Bookmark, forceNewTab: boolean = false) {
+	openBookmark(bookmark: Bookmark, forceNewTab = false) {
 		// Use type assertion to access internal plugins
 		// @ts-ignore - using internal API
 		const internalPlugins = this.app.internalPlugins;
@@ -149,6 +153,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 					.onClick(() => {
 						this.plugin.settings.bookmarks.push({
 							url: "https://",
+							title: "",
 							ribbon: false,
 							command: true,
 							newTab: false,
@@ -211,6 +216,21 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 						.setValue(bookmark.url)
 						.onChange(async (value) => {
 							this.plugin.settings.bookmarks[index].url = value;
+							await this.plugin.saveSettings();
+						});
+				});
+
+			// Title Setting
+			new Setting(bookmarkDiv)
+				.setName("Title (optional)")
+				.setDesc(
+					"This will be displayed for the command and on hover for the ribbon"
+				)
+				.addText((text) => {
+					text.setPlaceholder("")
+						.setValue(bookmark.title)
+						.onChange(async (value) => {
+							this.plugin.settings.bookmarks[index].title = value;
 							await this.plugin.saveSettings();
 						});
 				});
