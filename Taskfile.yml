@@ -15,6 +15,7 @@ tasks:
     build: npm run build
 
     bump:
+        desc: "Commit Changes and bump minor version"
         cmds:
             - git add .
             - git commit -m "bump"
@@ -22,6 +23,7 @@ tasks:
             - npm run version
 
     release:
+        desc: "Commit Changes, create version tag, push to Github and create a new release on GitHub"
         cmds:
             - git add .
             - git commit -m "{{.VERSION}} Commit"
