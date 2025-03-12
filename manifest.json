@@ -1,7 +1,7 @@
 {
 	"id": "webviewer-bookmarks",
 	"name": "Web Viewer Bookmarks",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"minAppVersion": "1.8.0",
 	"description": "Create and manage bookmarks for the built-in Web Viewer.",
 	"author": "Stefan Danzl",
