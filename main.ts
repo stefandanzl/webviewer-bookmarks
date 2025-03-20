@@ -142,8 +142,6 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Web Viewer Bookmarks Settings" });
-
 		new Setting(containerEl)
 			.setDesc("Manage your bookmarks for the Web Viewer plugin")
 			.addButton((button) => {
@@ -251,7 +249,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 
 			// Ribbon Toggle Setting
 			new Setting(bookmarkDiv)
-				.setName("Show in Ribbon")
+				.setName("Show in ribbon")
 				.setDesc("Display this bookmark as an icon in the ribbon")
 				.addToggle((toggle) => {
 					toggle.setValue(bookmark.ribbon).onChange(async (value) => {
@@ -262,7 +260,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 
 			// Command Toggle Setting
 			new Setting(bookmarkDiv)
-				.setName("Create Command")
+				.setName("Create command")
 				.setDesc("Create a command to open this bookmark")
 				.addToggle((toggle) => {
 					toggle
@@ -276,7 +274,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 
 			// New Tab Toggle Setting
 			new Setting(bookmarkDiv)
-				.setName("Open in New Tab")
+				.setName("Open in new tab")
 				.setDesc("Open this bookmark in a new tab by default")
 				.addToggle((toggle) => {
 					toggle.setValue(bookmark.newTab).onChange(async (value) => {
@@ -287,7 +285,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 		});
 
 		new Setting(containerEl)
-			.setName("Reload App")
+			.setName("Reload app")
 			.setDesc("Reload Obsidian for changes to ribbons")
 			.addButton((button) => {
 				button
