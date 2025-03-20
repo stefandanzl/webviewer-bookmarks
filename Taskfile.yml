@@ -18,7 +18,8 @@ tasks:
         desc: "Commit Changes and bump minor version"
         cmds:
             - git add .
-            - git commit -m "bump"
+            - cmd: git commit -m "bump"
+              ignore_error: true
             - npm version minor
             - npm run version
 
