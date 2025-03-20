@@ -26,6 +26,7 @@ tasks:
     release:
         desc: "Commit Changes, create version tag, push to Github and create a new release on GitHub"
         cmds:
+            - task: build
             - git add .
             - cmd: git commit -m "{{.VERSION}} Commit"
               ignore_error: true
