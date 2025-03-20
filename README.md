@@ -1,4 +1,4 @@
-# Obsidian Web Bookmarks
+# 'Web Viewer Bookmarks' Community Plugin for Obsidian
 
 A simple plugin for Obsidian that allows you to create and manage bookmarks for websites using Obsidian's built-in web viewer.
 
