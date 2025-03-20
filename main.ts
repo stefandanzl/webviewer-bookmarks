@@ -146,7 +146,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 			.setDesc("Manage your bookmarks for the Web Viewer plugin")
 			.addButton((button) => {
 				button
-					.setButtonText("Add Bookmark")
+					.setButtonText("Add bookmark")
 					.setCta()
 					.onClick(() => {
 						this.plugin.settings.bookmarks.push({
