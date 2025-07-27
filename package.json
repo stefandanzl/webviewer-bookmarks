@@ -1,6 +1,6 @@
 {
 	"name": "webviewer-bookmarks",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"description": "Create and manage bookmarks for the built-in Web viewer",
 	"main": "main.js",
 	"scripts": {
