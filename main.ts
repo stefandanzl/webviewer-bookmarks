@@ -42,7 +42,7 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 			if (bookmark.command) {
 				this.addCommand({
 					id: `open-webviewer-bookmark-${index}`,
-					name: `Open Web Viewer Bookmark: ${this.getDisplayName(
+					name: `Open Web viewer Bookmark: ${this.getDisplayName(
 						bookmark
 					)}`,
 					icon: iconName,
@@ -95,8 +95,8 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 		const webViewer = internalPlugins.getPluginById("webviewer");
 
 		if (!webViewer || !webViewer.enabled) {
-			new Notice("Web Viewer plugin is not enabled");
-			console.error("Web Viewer plugin is not enabled");
+			new Notice("Web viewer plugin is not enabled");
+			console.error("Web viewer plugin is not enabled");
 			return;
 		}
 
@@ -143,7 +143,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setDesc("Manage your bookmarks for the Web Viewer plugin")
+			.setDesc("Manage your bookmarks for the Web viewer plugin")
 			.addButton((button) => {
 				button
 					.setButtonText("Add bookmark")
@@ -208,7 +208,7 @@ class WebViewerBookmarksSettingTab extends PluginSettingTab {
 			// URL Setting
 			new Setting(bookmarkDiv)
 				.setName("URL")
-				.setDesc("The website address to open in Web Viewer")
+				.setDesc("The website address to open in Web viewer")
 				.addText((text) => {
 					text.setPlaceholder("https://")
 						.setValue(bookmark.url)

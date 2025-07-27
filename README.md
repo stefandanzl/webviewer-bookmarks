@@ -1,4 +1,4 @@
-# Web Viewer Bookmarks
+# Web viewer Bookmarks
 
 A simple community plugin for Obsidian that allows you to create and manage bookmarks for websites when using Obsidian's built-in web viewer.
 
@@ -13,7 +13,7 @@ A simple community plugin for Obsidian that allows you to create and manage book
 
 1. In Obsidian, go to Settings → Community plugins
 2. Disable Safe mode
-3. Click "Browse" and search for "Web Viewer Bookmarks"
+3. Click "Browse" and search for "Web viewer Bookmarks"
 4. Install the plugin
 5. Enable the plugin in your list of installed plugins
 
@@ -27,7 +27,7 @@ A simple community plugin for Obsidian that allows you to create and manage book
 
 ### Managing Bookmarks
 
-1. Go to Settings → Web Viewer Bookmarks
+1. Go to Settings → Web viewer Bookmarks
 2. Here you can:
    - Add bookmarks
    - Edit existing bookmarks
