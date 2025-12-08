@@ -49,6 +49,20 @@ For each bookmark, you can choose to:
 
 **Note:** After making changes to bookmarks, Obsidian must be reloaded for the changes to take effect.
 
+### Using `{{selection}}` in bookmarks
+
+- You can include the template `{{selection}}` in a bookmark URL to insert the currently selected text from the active Markdown editor.
+- Example URL for a search engine: `https://www.duckduckgo.com/?q={{selection}}`
+- If you select the word `duck` in a Markdown note and run that bookmark, the plugin will open `https://www.duckduckgo.com/?q=duck` (the selection is URL-encoded).
+
+Encoding details:
+- The plugin uses percent-encoding via `encodeURIComponent` for the inserted selection. That means spaces become `%20` and special characters are encoded according to standard URL percent-encoding rules. This is the safest and most compatible default behavior.
+- If nothing is selected in the active Markdown editor, the `{{selection}}` placeholder is replaced with an empty string (the URL will open without a search term).
+
+Notes and limitations:
+- The selection is read from the active Markdown editor (Obsidian's `MarkdownView.editor.getSelection()`). It does not (currently) read selections from embedded webviews or iframes.
+- Some sites expect `+` instead of `%20` for spaces (form-style encoding). The plugin uses percent-encoding by default to avoid surprises; if you need site-specific behavior you can adapt the bookmark URL accordingly.
+
 
 ## Troubleshooting
 

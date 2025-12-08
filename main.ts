@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, Notice } from "obsidian";
+import { App, Plugin, PluginSettingTab, Setting, Notice, MarkdownView } from "obsidian";
 
 interface Bookmark {
 	url: string;
@@ -102,11 +102,38 @@ export default class WebViewerBookmarksPlugin extends Plugin {
 
 		const openInNewTab = forceNewTab || bookmark.newTab;
 
+		// Prepare URL: replace templates like {{selection}} if present
+		let urlToOpen = bookmark.url;
+		const selectionPlaceholder = /{{\s*selection\s*}}/g;
+
+		if (selectionPlaceholder.test(urlToOpen)) {
+			// Use the standard Obsidian API (MarkdownView.editor.getSelection())
+			const sel = this.getSelectionFromWebViewer();
+			const insert = sel && sel.trim() !== "" ? encodeURIComponent(sel.trim()) : "";
+			urlToOpen = urlToOpen.replace(selectionPlaceholder, insert);
+		}
+
 		// Access through window to bypass TypeScript restrictions
 		// @ts-ignore - using internal API
 		this.app.internalPlugins
 			.getEnabledPluginById("webviewer")
-			.openUrl(bookmark.url, openInNewTab);
+			.openUrl(urlToOpen, openInNewTab);
+	}
+
+	/**
+	 * Use the standard Obsidian API to get the current selection from the active Markdown editor.
+	 */
+	getSelectionFromWebViewer(): string | undefined {
+		try {
+			const mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
+			if (mdView && mdView.editor) {
+				return mdView.editor.getSelection();
+			}
+			return undefined;
+		} catch (e) {
+			console.error("Error while attempting to retrieve selection via MarkdownView", e);
+			return undefined;
+		}
 	}
 
 	async loadSettings() {
