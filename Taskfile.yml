@@ -3,16 +3,53 @@
 version: "3"
 
 vars:
+    # VAULT: hirn
+    # VAULTS_DIR: C:\PROJECTS\OBSIDIAN\
+    DIR_PLUGIN: "{{.VAULTS_DIR}}/{{.VAULT}}/.obsidian/plugins/webviewer-bookmarks"
+
+    # USER_WORKING_DIR: C:\PROJECTS\Obsidian\{{.VAULT}}
     FILES: "main.js styles.css manifest.json"
     VERSION:
         sh: node -e "console.log(require('./package.json').version)"
 
+dotenv: [".env"]
+
 tasks:
-    default: task -a
+    default:
+        cmds:
+            - task: build
+            - task: copy
+    copy:
+        cmds:
+            - cp main.js "{{.DIR_PLUGIN}}/main.js"
+            - cp styles.css "{{.DIR_PLUGIN}}/styles.css"
+            - cp manifest.json "{{.DIR_PLUGIN}}/manifest.json"
+
+    build:
+        cmds:
+            - npm run build
+    patch:
+        cmds:
+            - npm version patch
+    git:
+        cmds:
+            - git add .
+            - git commit -m "task"
+            - git push
+    # test:
+    #   cmds:
+    #     - npm test -env-file .env
+    research:
+        cmds:
+            - node tests/exclude/research.js
+    minify:
+        cmds:
+            - terser main.js -o main.min.js
+    time:
+        cmds:
+            - date +%T
 
     dev: npm run dev
-
-    build: npm run build
 
     bump:
         desc: "Commit Changes and bump minor version"
@@ -26,7 +63,6 @@ tasks:
     release:
         desc: "Commit Changes, create version tag, push to Github and create a new release on GitHub"
         cmds:
-            - task: build
             - git add .
             - cmd: git commit -m "{{.VERSION}} Commit"
               ignore_error: true
@@ -37,7 +73,7 @@ tasks:
 
     release-create:
         cmds:
-            - gh release create {{.VERSION}} --title "{{.VERSION}}" --notes "New release of the Web Bookmarks plugin for Obsidian." {{.FILES}}
+            - gh release create {{.VERSION}} --title "{{.VERSION}}" --notes "New release of the Web viewer Bookmarks plugin for Obsidian." {{.FILES}}
 
     test:
         cmds:
